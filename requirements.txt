@@ -1,3 +1,5 @@
 numpy
 pytorch
 pytest
+graphviz
+
