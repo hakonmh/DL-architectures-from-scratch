@@ -2,4 +2,4 @@ numpy
 pytorch
 pytest
 graphviz
-
+matplotlib

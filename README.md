@@ -1,6 +1,6 @@
 # Deep Learning from Scratch
 
-This repository attempts to build different neural network architectures from scratch using only numpy. The goal is to keep my understanding of the inner workings of neural networks and the math behind them fresh, since it is easy to forget the details when using high-level libraries.
+This repository attempts to build different neural network architectures from scratch using only Pure Python. The goal is to keep my understanding of the inner workings of neural networks and the math behind them fresh, since it is easy to forget the details when using high-level libraries.
 
 The code is written in a way that is easy to understand and to follow along. Explanations are provided in the form of Jupyter notebooks. The code is also tested against PyTorch implementations of the same models to make sure the implementation is correct.
 
