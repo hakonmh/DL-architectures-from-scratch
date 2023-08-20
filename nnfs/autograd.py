@@ -3,11 +3,12 @@ import math
 
 class Value:
 
-    def __init__(self, data):
+    def __init__(self, data, label=''):
         self.data = data
         self._children = set()
         self._operator = ''
         self.grad = 0
+        self.label = label
         self._backward = lambda: None
 
     @classmethod
@@ -83,21 +84,37 @@ class Value:
         out._backward = _backward
         return out
 
-    def backward(self):
-        topo = self._build_topo_graph()
-        # dy/dy is always equal to 1, we need to set it to 1 before backpropagating
-        # the gradient through the graph
-        self.grad = 1
-        for v in reversed(topo):
-            v._backward()
+    def tanh(self):
+        x = self.data
+        tanh = (math.exp(2 * x) - 1) / (math.exp(2 * x) + 1)
+        out = Value._from_operation(tanh, (self, ), 'tanh')
 
-    def _build_topo_graph(self):
-        # Builds a topological graph of all children of the current Value object
+        def _backward():
+            self.grad += (1 - tanh**2) * out.grad
+        out._backward = _backward
+        return out
+
+    def relu(self):
+        out = Value._from_operation(max(0, self.data), (self,), 'ReLU')
+
+        def _backward():
+            self.grad += (out.data > 0) * out.grad
+        out._backward = _backward
+        return out
+
+    def backward(self):
         topo = []
         visited = set()
-        if self not in visited:
-            visited.add(self)
-            for child in self._children:
-                topo.extend(child._build_topo_graph())
-            topo.append(self)
-        return topo
+
+        def _build_topo_graph(v):
+            if v not in visited:
+                visited.add(v)
+                for child in v._children:
+                    _build_topo_graph(child)
+                topo.append(v)
+
+        _build_topo_graph(self)
+
+        self.grad = 1.0
+        for node in reversed(topo):
+            node._backward()

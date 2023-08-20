@@ -25,7 +25,7 @@ def draw_dot(root, format='svg', rankdir='LR'):
     dot = Digraph(format=format, graph_attr={'rankdir': rankdir})
 
     for n in nodes:
-        if hasattr(n, 'label'):
+        if hasattr(n, 'label') and n.label:
             dot.node(name=str(id(n)),
                      label="{ %s | data %.4f | grad %.4f }" % (n.label, n.data, n.grad),
                      shape='record')
