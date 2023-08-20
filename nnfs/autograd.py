@@ -1,87 +1,64 @@
+import math
+
+
 class Value:
-    """ stores a single scalar value and its gradient """
 
     def __init__(self, data):
         self.data = data
+        self._children = set()
+        self._operator = ''
         self.grad = 0
-        # internal variables used for autograd graph construction
         self._backward = lambda: None
-        self._children = ()
-        self._operator = ''  # the op that produced this node, for graphviz / debugging / etc
 
-    @property
-    def _children(self):
-        return self._children
+    @classmethod
+    def _from_operation(cls, data, children, operator):
+        """Create new object from an operation which stores the operator and operands used
+        to produce it.
+        """
+        out = cls(data)
+        out._children = set(children)
+        out._operator = operator
+        return out
 
-    @_children.setter
-    def _children(self, value):
-        self._children = set(value)
+    def __repr__(self):
+        return f"Value({self.data}, grad={self.grad})"
 
     def __add__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data + other.data)
-        out._children = (self, other)
-        out._operator = '+'
+        other = other if isinstance(other, Value) else Value(other)  # Convert to Value if needed
+        out = Value._from_operation(self.data + other.data, (self, other), '+')
 
         def _backward():
             self.grad += out.grad
             other.grad += out.grad
-        out._backward = _backward
-
+        self._backward = _backward
         return out
+
+    def __sub__(self, other):
+        # Implemented a-b as a+(b*-1) to reuse already implemented operations
+        return self + (-other)
 
     def __mul__(self, other):
         other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data * other.data)
-        out._children = (self, other)
-        out._operator = '*'
+        out = Value._from_operation(self.data * other.data, (self, other), '*')
 
         def _backward():
             self.grad += other.data * out.grad
             other.grad += self.data * out.grad
-        out._backward = _backward
-
+        self._backward = _backward
         return out
 
     def __pow__(self, other):
-        out = Value(self.data**other)
-        out._children = (self, )
-        out._operator = f'**{other}'
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value._from_operation(self.data ** other.data, (self, other), '**')
 
         def _backward():
             self.grad += (other * self.data**(other - 1)) * out.grad
         out._backward = _backward
-
         return out
 
-    def relu(self):
-        out = Value(max(0, self.data))
-        out._children = (self, )
-        out._operator = 'ReLU'
-
-        def _backward():
-            self.grad += (out.data > 0) * out.grad
-        out._backward = _backward
-
-        return out
-
-    def backward(self):
-        # topological order all of the children in the graph
-        topo = []
-        visited = set()
-
-        def build_topo(v):
-            if v not in visited:
-                visited.add(v)
-                for child in v._children:
-                    build_topo(child)
-                topo.append(v)
-
-        build_topo(self)
-        # go one variable at a time and apply the chain rule to get its gradient
-        self.grad = 1
-        for v in reversed(topo):
-            v._backward()
+    def __truediv__(self, other):
+        # Implemented as a/b as a*b^-1 to reuse already implemented operations
+        return self * other**-1
 
     def __neg__(self):
         return self * -1
@@ -89,20 +66,38 @@ class Value:
     def __radd__(self, other):
         return self + other
 
-    def __sub__(self, other):
-        return self + (-other)
-
     def __rsub__(self, other):
         return other + (-self)
 
     def __rmul__(self, other):
         return self * other
 
-    def __truediv__(self, other):
-        return self * other**-1
-
     def __rtruediv__(self, other):
         return other * self**-1
 
-    def __repr__(self):
-        return f"Value(data={self.data}, grad={self.grad})"
+    def exp(self):
+        out = Value._from_operation(math.exp(self.data), (self, ), 'exp')
+
+        def _backward():
+            self.grad += out.data * out.grad
+        out._backward = _backward
+        return out
+
+    def backward(self):
+        topo = self._build_topo_graph()
+        # dy/dy is always equal to 1, we need to set it to 1 before backpropagating
+        # the gradient through the graph
+        self.grad = 1
+        for v in reversed(topo):
+            v._backward()
+
+    def _build_topo_graph(self):
+        # Builds a topological graph of all children of the current Value object
+        topo = []
+        visited = set()
+        if self not in visited:
+            visited.add(self)
+            for child in self._children:
+                topo.extend(child._build_topo_graph())
+            topo.append(self)
+        return topo
