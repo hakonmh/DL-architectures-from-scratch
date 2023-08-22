@@ -1,4 +1,5 @@
 from graphviz import Digraph  # Download at https://graphviz.org/download/
+from .autograd import Value
 
 
 def trace(root):
