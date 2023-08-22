@@ -22,7 +22,10 @@ class Value:
         return out
 
     def __repr__(self):
-        return f"Value({self.data}, grad={self.grad})"
+        if hasattr(self, 'label') and self.label:
+            return f"Value({self.data:.4f}, grad={self.grad:.4f}, label={self.label})"
+        else:
+            return f"Value({self.data:.4f}, grad={self.grad:.4f})"
 
     def __add__(self, other):
         other = other if isinstance(other, Value) else Value(other)  # Convert to Value if needed
