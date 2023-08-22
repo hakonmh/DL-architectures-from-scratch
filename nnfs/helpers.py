@@ -43,3 +43,11 @@ def draw_dot(root, format='svg', rankdir='LR'):
         dot.edge(str(id(n1)), str(id(n2)) + n2._operator)
 
     return dot
+
+
+def np_array_to_list_of_values(array):
+    """Converts a numpy array to a list of Value objects."""
+    if len(array.shape) == 1:
+        return [Value(x) for x in array]
+    elif len(array.shape) > 1:  # works recursively
+        return [np_array_to_list_of_values(x) for x in array]
