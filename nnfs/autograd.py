@@ -31,7 +31,7 @@ class Value:
         def _backward():
             self.grad += out.grad
             other.grad += out.grad
-        self._backward = _backward
+        out._backward = _backward
         return out
 
     def __sub__(self, other):
@@ -45,21 +45,22 @@ class Value:
         def _backward():
             self.grad += other.data * out.grad
             other.grad += self.data * out.grad
-        self._backward = _backward
+        out._backward = _backward
         return out
 
     def __pow__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value._from_operation(self.data ** other.data, (self, other), '**')
+        other = other.data if isinstance(other, Value) else other
+        out = Value._from_operation(self.data ** other, (self,), f'**{other}')
 
         def _backward():
             self.grad += (other * self.data**(other - 1)) * out.grad
+            # other.grad += (math.log(self.data) * self.data**other.data) * out.grad
         out._backward = _backward
         return out
 
     def __truediv__(self, other):
         # Implemented as a/b as a*b^-1 to reuse already implemented operations
-        return self * other**-1
+        return self * other**(-1)
 
     def __neg__(self):
         return self * -1
@@ -74,7 +75,7 @@ class Value:
         return self * other
 
     def __rtruediv__(self, other):
-        return other * self**-1
+        return other * self**(-1)
 
     def exp(self):
         out = Value._from_operation(math.exp(self.data), (self, ), 'exp')
