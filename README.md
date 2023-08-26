@@ -4,32 +4,31 @@ This repository attempts to build different neural network architectures from sc
 
 The code is written in a way that is easy to understand and to follow along. Explanations are provided in the form of Jupyter notebooks. The code is also tested against PyTorch implementations of the same models to make sure the implementation is correct.
 
-We first start with implementing AutoGrad, which is the backbone of PyTorch and is used to. We then use AutoGrad to implement a simple neural network with one hidden layer. The goal is to later implement more complex architectures like CNNs, RNNs and Transformers.
+We first start with implementing AutoGrad, which is the backbone of PyTorch and is used to do automatic differentiation. We then use AutoGrad to implement a simple neural network with one hidden layer. The goal is to later implement more complex architectures like CNNs, RNNs and Transformers.
 
 ## Layout
 
 The repository is structured as follows:
 
-* `dlfs`: The source code for auto-grad and the neural network implementations.
-* `notebooks`: Jupyter notebooks for explaining the code in `dlfs` detail.
-* `tests`: Unit tests for the code.
-* `examples`: Where models are trained and compared to PyTorch equivalent models to make sure the implementation is correct.
-* `data`: Where the data is stored. We use several different datasets to test the models based on the task they are designed for.
+* `nnfs`: The source code for autograd and the implementation of neural network architectures.
+* `notebooks`: Jupyter notebooks for explaining the code in `nnfs` in detail.
+* `tests`: Unit tests for the code in `nnfs`.
+* `data`: Where the datasets used in `notebooks` is stored. We use several different datasets to test the models based on the task they are designed for.
 
 ## Status
 
 The following models and tasks have been implemented:
 
 * [x] AutoGrad
-* [x] Simple Neural Network
-* [ ] Convolutional Neural Network
+* [x] Vanilla Neural Network
 * [ ] Recurrent Neural Network
 * [ ] LSTM
 * [ ] Transformer
+* [ ] Convolutional Neural Network
 
 ## Requirements
 
-Only `numpy` is required to run the models. However, `torch` and `matplotlib` is required to run the notebooks, while `pytest` is required to run the tests.
+There is no requirements to run the models, but `numpy` is used in some helper functions. Several libraries like `graphviz`, `numpy` and `matplotlib` is required to run the notebooks, while `pytest`, `torch`, and `numpy` is required to run the tests.
 
 ## Sources
 
