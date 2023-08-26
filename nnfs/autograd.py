@@ -88,6 +88,14 @@ class Value:
         out._backward = _backward
         return out
 
+    def log(self):
+        out = Value._from_operation(math.log(self.data), (self, ), 'log')
+
+        def _backward():
+            self.grad += (1 / self.data) * out.grad
+        out._backward = _backward
+        return out
+
     def tanh(self):
         x = self.data
         tanh = (math.exp(2 * x) - 1) / (math.exp(2 * x) + 1)
