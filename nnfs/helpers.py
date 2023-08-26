@@ -1,5 +1,6 @@
-from graphviz import Digraph  # Download at https://graphviz.org/download/
 from .autograd import Value
+from graphviz import Digraph  # Download at https://graphviz.org/download/
+import numpy as np
 
 
 def trace(root):
@@ -51,3 +52,11 @@ def np_array_to_list_of_values(array):
         return [Value(x) for x in array]
     elif len(array.shape) > 1:  # works recursively
         return [np_array_to_list_of_values(x) for x in array]
+
+
+def list_of_values_to_np_array(values):
+    """Converts a list of Value objects to a numpy array."""
+    if isinstance(values[0], Value):
+        return np.array([v.data for v in values])
+    elif isinstance(values[0], list):  # works recursively
+        return np.array([list_of_values_to_np_array(x) for x in values])
