@@ -1,4 +1,4 @@
-# Deep Learning from Scratch
+# Deep Learning Architectures from Scratch
 
 This repository attempts to build different neural network architectures from scratch using only Pure Python. The goal is to keep my understanding of the inner workings of neural networks and the math behind them fresh, since it is easy to forget the details when using high-level libraries.
 
@@ -28,7 +28,7 @@ The following models and tasks have been implemented:
 
 ## Requirements
 
-There is no requirements to run the models, but `numpy` is used in some helper functions. Several libraries like `graphviz`, `numpy` and `matplotlib` is required to run the notebooks, while `pytest`, `torch`, and `numpy` is required to run the tests.
+There is no requirements to run the models themself, but `numpy` is used for some convenience functions found in `helpers`. Several libraries like `graphviz`, `pandas`, `numpy` and `matplotlib` is required to run the notebooks, while `pytest`, `torch`, and `numpy` is required to run the tests.
 
 ## Sources
 
