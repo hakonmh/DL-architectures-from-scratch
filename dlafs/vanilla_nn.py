@@ -1,5 +1,5 @@
 import random
-from nnfs.autograd import Value
+from dlafs.autograd import Value
 
 
 class Module:

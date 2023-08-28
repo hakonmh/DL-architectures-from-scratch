@@ -10,9 +10,9 @@ We first start with implementing AutoGrad, which is the backbone of PyTorch and 
 
 The repository is structured as follows:
 
-* `nnfs`: The source code for autograd and the implementation of neural network architectures.
-* `notebooks`: Jupyter notebooks for explaining the code in `nnfs` in detail.
-* `tests`: Unit tests for the code in `nnfs`.
+* `dlafs`: The source code for autograd and the implementation of neural network architectures.
+* `notebooks`: Jupyter notebooks for explaining the code in `dlafs` in detail.
+* `tests`: Unit tests for the code in `dlafs`.
 * `data`: Where the datasets used in `notebooks` is stored. We use several different datasets to test the models based on the task they are designed for.
 
 ## Status
@@ -35,5 +35,5 @@ There is no requirements to run the models themself, but `numpy` is used for som
 The following sources have been used to implement the models:
 
 * [Andrej Karpathy's Intro to Backprop and Neural Nets](https://www.youtube.com/watch?v=VMj-3S1tku0)
-* [Andrej Karpathy's GPT from Scratch](https://cs231n.github.io/)
+* [Andrej Karpathy's GPT from Scratch](https://www.youtube.com/watch?v=kCc8FmEb1nY)
 * [PyTorch`s Autograd](https://pytorch.org/docs/stable/notes/autograd.html)
