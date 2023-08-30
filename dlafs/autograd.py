@@ -52,12 +52,12 @@ class Value:
         return out
 
     def __pow__(self, other):
-        other = other.data if isinstance(other, Value) else other
-        out = Value._from_operation(self.data ** other, (self,), f'**{other}')
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value._from_operation(self.data ** other.data, (self, other), '**')
 
         def _backward():
-            self.grad += (other * self.data**(other - 1)) * out.grad
-            # other.grad += (math.log(self.data) * self.data**other.data) * out.grad
+            self.grad += (other.data * self.data**(other.data - 1)) * out.grad
+            other.grad += (out.data * math.log(self.data)) * out.grad
         out._backward = _backward
         return out
 
