@@ -114,6 +114,14 @@ class Value:
         out._backward = _backward
         return out
 
+    def sigmoid(self):
+        out = Value._from_operation(1 / (1 + math.exp(-self.data)), (self,), 'sigmoid')
+
+        def _backward():
+            self.grad += (out.data * (1 - out.data)) * out.grad
+        out._backward = _backward
+        return out
+
     def backward(self):
         topo = []
         visited = set()
