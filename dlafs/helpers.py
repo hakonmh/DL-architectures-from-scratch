@@ -46,6 +46,16 @@ def draw_dot(root, format='svg', rankdir='LR'):
     return dot
 
 
+def argmax(values):
+    """Returns the index of the maximum value in the list.
+
+    Used to convert one-hot encoded vectors to class labels.
+    """
+    if isinstance(values[0], Value):
+        values = [o.data for o in values]
+    return max(enumerate(values), key=lambda x: x[1])[0]
+
+
 def np_array_to_list_of_values(array):
     """Converts a numpy array to a list of Value objects."""
     if len(array.shape) == 1:

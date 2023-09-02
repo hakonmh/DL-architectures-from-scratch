@@ -1,6 +1,19 @@
 import numpy as np
 from dlafs import Value
-from dlafs.helpers import np_array_to_list_of_values, list_of_values_to_np_array
+from dlafs.helpers import *
+
+
+def test_argmax():
+    # Arrange
+    values = [
+        [0.1, 0.2, 0.3, 0.4],
+        [0.7, 0.15, 0.075, 0.075],
+    ]
+    expected = [3, 0]
+    # Act
+    actual = [argmax(sample) for sample in values]
+    # Assert
+    assert all([a == e for a, e in zip(actual, expected)])
 
 
 def test_list_of_values_to_np():
