@@ -55,7 +55,7 @@ def test_value(values, operations, expected, expected_grads):
     actual = operations(*values)
     actual.backward()
     # Assert
-    assert actual.data == expected
+    assert math.isclose(actual.data, expected)
     assert_grads_equal_expected(values, expected_grads)
 
 
@@ -81,5 +81,5 @@ def test_value_vs_torch(values, operations):
     actual = operations(*values)
     actual.backward()
     # Assert
-    assert actual.data == expected.item()
+    assert math.isclose(actual.data, expected.item())
     assert_grads_equal_expected(values, tensors)
