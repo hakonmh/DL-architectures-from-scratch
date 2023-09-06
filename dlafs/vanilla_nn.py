@@ -32,6 +32,8 @@ class Neuron(Module):
             out = act.tanh()
         elif self.activation == 'relu':
             out = act.relu()
+        elif self.activation == 'sigmoid':
+            out = act.sigmoid()
         else:
             out = act
         return out
