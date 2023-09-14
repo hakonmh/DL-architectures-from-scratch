@@ -1,5 +1,8 @@
 from dlafs.autograd import Value
-from dlafs.helpers import np_array_to_list_of_values
+from dlafs.helpers import (
+    np_array_to_list_of_values,
+    list_of_values_to_np_array
+)
 
 
 class ValueArray:
@@ -30,7 +33,7 @@ class ValueArray:
     @classmethod
     def from_list(cls, data, dtype='float'):
         """Create an Array from a list (potentially nested)"""
-        shape = cls._get_shape_from_data(data)
+        shape = tuple(cls._get_shape_from_data(data))
         instance = cls(shape, dtype)
         instance._set_data_from_list(data)
         return instance
@@ -58,6 +61,10 @@ class ValueArray:
                     target_data = target_data[ind]
                 val = Value(val) if not isinstance(val, Value) else val
                 target_data[current_index[-1]] = val
+
+    def to_numpy(self):
+        """Convert the Array to a numpy array"""
+        return list_of_values_to_np_array(self.values)
 
     def __getitem__(self, index):
         if not isinstance(index, tuple):
