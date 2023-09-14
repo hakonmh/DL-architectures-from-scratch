@@ -138,3 +138,9 @@ class Value:
         self.grad = 1.0
         for node in reversed(topo):
             node._backward()
+
+    def __eq__(self, other):
+        return self.data == other.data and self.grad == other.grad
+
+    def __hash__(self):
+        return hash(id(self))
