@@ -140,6 +140,8 @@ class Value:
             node._backward()
 
     def __eq__(self, other):
+        if not isinstance(other, Value):
+            return False
         return self.data == other.data and self.grad == other.grad
 
     def __hash__(self):
