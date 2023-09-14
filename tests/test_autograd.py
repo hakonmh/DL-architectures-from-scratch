@@ -83,3 +83,18 @@ def test_value_vs_torch(values, operations):
     # Assert
     assert math.isclose(actual.data, expected.item())
     assert_grads_equal_expected(values, tensors)
+
+
+def test_equals():
+    # Arrange
+    actual = Value(3)
+    expected = Value(3)
+
+    wrong_value = Value(4)
+    wrong_grad = Value(3); wrong_grad.grad = 1
+    wrong_obj_type = 3
+    # Assert
+    assert actual == expected
+    assert actual != wrong_value
+    assert actual != wrong_grad
+    assert actual != wrong_obj_type
