@@ -1,5 +1,6 @@
 import math
 import copy
+from numbers import Number
 
 
 class Value:
@@ -13,6 +14,8 @@ class Value:
     def __init__(self, data, label=''):
         if isinstance(data, Value):
             return
+        if not isinstance(data, Number):
+            raise TypeError(f"Value must be a number, not {type(data)}")
 
         self.data = data
         self.grad = 0
