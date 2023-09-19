@@ -1,6 +1,7 @@
 import math
 import copy
 from numbers import Number
+from dlafs._utils import format_float_string
 
 
 class Value:
@@ -169,11 +170,3 @@ class Value:
         new._operator = self._operator
         new._backward = self._backward
         return new
-
-
-def format_float_string(f):
-    """Formats a float to a string with significant digits."""
-    # Format the float with no trailing zeroes
-    s = "{:.6f}".format(f)
-    # Remove trailing zeroes and potentially a trailing dot
-    return s.rstrip('0').rstrip('.') if '.' in s else s

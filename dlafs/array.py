@@ -3,6 +3,7 @@ from dlafs.helpers import (
     np_array_to_list_of_values,
     list_of_values_to_np_array
 )
+from dlafs._utils import format_float_string
 from collections.abc import Sequence
 
 
@@ -13,10 +14,9 @@ class ValueArray:
     understand.
     """
 
-    def __init__(self, shape, dtype='float'):
+    def __init__(self, shape):
         self.shape = shape
         self.values = self._create_array(self.shape)
-        self.dtype = dtype
 
     def _create_array(self, shape):
         if len(shape) == 1:
@@ -27,15 +27,14 @@ class ValueArray:
     @classmethod
     def from_numpy(cls, data):
         """Create an Array from a numpy array"""
-        dtype = 'float' if 'float' in str(data.dtype) else 'int'
         data = np_array_to_list_of_values(data)
-        return cls.from_list(data, dtype)
+        return cls.from_list(data)
 
     @classmethod
-    def from_list(cls, data, dtype='float'):
+    def from_list(cls, data):
         """Create an Array from a list (potentially nested)"""
         shape = tuple(cls._get_shape_from_data(data))
-        instance = cls(shape, dtype)
+        instance = cls(shape)
         instance._set_data_from_list(data)
         return instance
 
@@ -76,9 +75,13 @@ class ValueArray:
         """Convert the Array to a numpy array"""
         return list_of_values_to_np_array(self.values)
 
-    def to_list(self):
+    def to_list(self, preserve_dtype=False):
         """Convert the Array to a nested list"""
         return self.to_numpy().tolist()
+
+    def __len__(self):
+        """Return the length of the Array"""
+        return len(self.values)
 
     def __getitem__(self, index):
         """Get an item from the Array using the given index"""
@@ -86,7 +89,7 @@ class ValueArray:
             index = (index,)
         item = self._recursive_getitem(self.values, index)
         if isinstance(item, list):  # Convert the list to an Array
-            return ValueArray.from_list(item, self.dtype)
+            return ValueArray.from_list(item)
         return item
 
     def _recursive_getitem(self, data, indices):
@@ -143,14 +146,16 @@ class ValueArray:
         return data
 
     def __repr__(self):
+        self._max_len = 0
         return f"ValueArray(\n    {self._repr_helper(self.values, depth=len(self.shape))}\n)"
 
     def _repr_helper(self, data, depth):
         if depth == 1:  # Base case: innermost list
-            if self.dtype == 'float':
-                return "[" + ", ".join(f"{val.data:.2f}" for val in data) + "]"
-            elif self.dtype == 'int':
-                return "[" + ", ".join(f"{val.data}" for val in data) + "]"
+            str_data = [format_float_string(val.data) for val in data]
+            # Add spaces to align the strings
+            self._max_len = max(max(len(val) for val in str_data), self._max_len)
+            str_data = [val + ' ' * (self._max_len - len(val)) for val in str_data]
+            return "[" + ", ".join(str_data) + "]"
         else:
             newlines = '\n' * (depth - 1)
             spaces = ' ' * (5 + len(self.shape) - depth)

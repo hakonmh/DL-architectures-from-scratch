@@ -60,13 +60,11 @@ def test_from_numpy(input_list):
     # Arrange
     np_array = np.array(input_list)
     expected = convert_list_items_to_value(input_list)
-    expected_dtype = 'float' if 'float' in str(np_array.dtype) else 'int'
     # Act
     actual = ValueArray.from_numpy(np_array)
     # Assert
     assert actual.values == expected
     assert actual.shape == np_array.shape
-    assert actual.dtype == expected_dtype
 
 
 def test_to_numpy():
