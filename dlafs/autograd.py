@@ -22,10 +22,12 @@ class Value:
         return out
 
     def __repr__(self):
+        value = format_float_string(self.data)
+        grad = format_float_string(self.grad)
         if hasattr(self, 'label') and self.label:
-            return f"Value({self.data:.4f}, grad={self.grad:.4f}, label={self.label})"
+            return f"Value({value}, grad={grad}, label={self.label})"
         else:
-            return f"Value({self.data:.4f}, grad={self.grad:.4f})"
+            return f"Value({value}, grad={grad})"
 
     def __add__(self, other):
         other = other if isinstance(other, Value) else Value(other)  # Convert to Value if needed
@@ -146,3 +148,11 @@ class Value:
 
     def __hash__(self):
         return hash(id(self))
+
+
+def format_float_string(f):
+    """Formats a float to a string with significant digits."""
+    # Format the float with no trailing zeroes
+    s = "{:.6f}".format(f)
+    # Remove trailing zeroes and potentially a trailing dot
+    return s.rstrip('0').rstrip('.') if '.' in s else s
