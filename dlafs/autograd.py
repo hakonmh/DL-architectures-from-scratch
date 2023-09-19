@@ -1,13 +1,23 @@
 import math
+import copy
 
 
 class Value:
 
+    def __new__(cls, data, label=''):
+        if isinstance(data, Value):
+            return copy.copy(data)
+        else:
+            return super().__new__(cls)
+
     def __init__(self, data, label=''):
+        if isinstance(data, Value):
+            return
+
         self.data = data
+        self.grad = 0
         self._children = set()
         self._operator = ''
-        self.grad = 0
         self.label = label
         self._backward = lambda: None
 
@@ -148,6 +158,14 @@ class Value:
 
     def __hash__(self):
         return hash(id(self))
+
+    def __copy__(self):
+        new = Value(self.data, self.label)
+        new.grad = self.grad
+        new._children = self._children
+        new._operator = self._operator
+        new._backward = self._backward
+        return new
 
 
 def format_float_string(f):
