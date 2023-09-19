@@ -1,6 +1,6 @@
 import pytest
 import math
-from dlafs import loss, Value
+from dlafs import loss, Value as V
 
 
 @pytest.mark.parametrize(
@@ -8,11 +8,11 @@ from dlafs import loss, Value
     [
         ([1, 2, -1, 0, -1], [0, 2, 1, 0, -1], 1.0),
         (
-            [Value(1), Value(2), Value(-1), Value(0), Value(-1)],
-            [Value(0), Value(2), Value(1), Value(0), Value(-1)],
+            [V(1), V(2), V(-1), V(0), V(-1)],
+            [V(0), V(2), V(1), V(0), V(-1)],
             1.0
         ),
-        (Value(1), Value(0), 1.0),
+        (V(1), V(0), 1.0),
         (1, 0, 1),
     ]
 )
@@ -20,7 +20,7 @@ def test_mse_loss(y, yhat, expected):
     # Arrange
     # Act
     mse = loss.mse(y, yhat)
-    if isinstance(mse, Value):
+    if isinstance(mse, V):
         mse = mse.data
     # Assert
     math.isclose(mse, expected)
@@ -31,18 +31,18 @@ def test_mse_loss(y, yhat, expected):
     [
         ([1, 2, 0, 1], [1, 2, 1, 0], 0.75),
         (
-            [Value(1), Value(2), Value(0), Value(1)],
-            [Value(1), Value(2), Value(1), Value(0)],
+            [V(1), V(2), V(0), V(1)],
+            [V(1), V(2), V(1), V(0)],
             0.75
         ),
-        (Value(1), Value(0), 0),
+        (V(1), V(0), 0),
     ]
 )
 def test_accuracy(y, yhat, expected):
     # Arrange
     # Act
     accuracy = loss.accuracy(y, yhat)
-    if isinstance(accuracy, Value):
+    if isinstance(accuracy, V):
         accuracy = accuracy.data
     # Assert
     math.isclose(accuracy, expected)
@@ -53,8 +53,8 @@ def test_accuracy(y, yhat, expected):
     [
         ([1, 0, 0, 0], [0.7, 0.1, 0.15, 0.05], 0.356674943938731),
         (
-            [Value(1), Value(0), Value(0), Value(0)],
-            [Value(0.7), Value(0.1), Value(0.15), Value(0.05)],
+            [V(1), V(0), V(0), V(0)],
+            [V(0.7), V(0.1), V(0.15), V(0.05)],
             0.356674943938731
         ),
         (
@@ -70,7 +70,7 @@ def test_cross_entropy_loss(y, yhat, expected):
     # Arrange
     # Act
     cross_entropy = loss.cross_entropy(y, yhat)
-    if isinstance(cross_entropy, Value):
+    if isinstance(cross_entropy, V):
         cross_entropy = cross_entropy.data
     # Assert
     assert math.isclose(cross_entropy, expected)
