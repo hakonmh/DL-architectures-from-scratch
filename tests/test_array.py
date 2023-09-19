@@ -2,6 +2,7 @@ import pytest
 from .fixtures import *
 
 import numpy as np
+import random
 from dlafs import ValueArray
 from dlafs import Value as V
 
@@ -24,6 +25,24 @@ def test_valuearray_init(shape, expected):
     # Assert
     assert actual.values == expected
     assert actual.to_numpy().shape == shape
+
+
+def test_valuearray_random():
+    # Arrange
+    random.seed(0)
+    expected = [
+        [V(0.941715), V(-1.396578)],
+        [V(-0.679714), V(0.370504)],
+        [V(-1.016349), V(-0.07212)]
+    ]
+    # Act
+    actual = ValueArray.random((3, 2))
+    print(actual)
+    # Assert
+    assert actual.shape == (3, 2)
+    for row, exp_row in zip(actual.values, expected):
+        for val, exp_val in zip(row, exp_row):
+            assert math.isclose(val.data, exp_val.data, rel_tol=1e-4)
 
 
 @pytest.mark.parametrize(

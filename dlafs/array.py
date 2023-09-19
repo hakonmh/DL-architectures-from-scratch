@@ -1,10 +1,12 @@
+import random
+from collections.abc import Sequence
+
 from dlafs.autograd import Value
 from dlafs.helpers import (
     np_array_to_list_of_values,
     list_of_values_to_np_array
 )
 from dlafs._utils import format_float_string
-from collections.abc import Sequence
 
 
 class ValueArray:
@@ -23,6 +25,14 @@ class ValueArray:
             return [Value(0) for x in range(shape[0])]
         elif len(shape) > 1:  # works recursively
             return [self._create_array(shape[1:]) for _ in range(shape[0])]
+
+    @classmethod
+    def random(cls, shape):
+        """Create Array of random values from a normal dist with mean 0 and std 1"""
+        instance = cls(shape)
+        instance.values = _randomize_values(instance.values)
+        instance.shape = tuple(instance._get_shape_from_data(instance.values))
+        return instance
 
     @classmethod
     def from_numpy(cls, data):
@@ -178,3 +188,10 @@ def _verify_integrity(current_idx, value):
             f"Shape mismatch: Trying to set data of lenth {len(value)} "
             f"on slice of length {len(current_idx)}"
         )
+
+
+def _randomize_values(data):
+    if isinstance(data[0], list):
+        return [_randomize_values(subdata) for subdata in data]
+    else:
+        return [Value(random.gauss(0, 1)) for _ in range(len(data))]
