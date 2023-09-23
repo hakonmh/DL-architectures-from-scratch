@@ -29,12 +29,10 @@ class ValueArray:
         return cls(data, label)
 
     @classmethod
-    def random(cls, shape, label=''):
+    def random(cls, shape, label='', mean=0, std=1):
         """Create Array of random values from a normal dist with mean 0 and std 1"""
-        instance = cls.zeros(shape, label)
-        instance.values = _randomize_values(instance.values)
-        instance.shape = tuple(_get_shape_from_data(instance.values))
-        return instance
+        data = _create_random_array(shape, mean, std)
+        return cls(data, label)
 
     @classmethod
     def from_numpy(cls, data, label=''):
@@ -53,6 +51,10 @@ class ValueArray:
     def __len__(self):
         """Return the length of the Array"""
         return len(self.values)
+
+    def dim(self):
+        """Return the number of dimensions of the Array"""
+        return len(self.shape)
 
     def __getitem__(self, index):
         """Get an item from the Array using the given index"""
@@ -83,7 +85,7 @@ class ValueArray:
         """Set an item in the Array using the given index"""
         if not isinstance(index, tuple):
             index = (index,)
-        for _ in range(len(self.shape) - len(index)):
+        for _ in range(self.dim() - len(index)):
             index = index + (slice(None),)
 
         data = self._recursive_setitem(self.values, index, value)
@@ -118,9 +120,12 @@ class ValueArray:
 
     def __repr__(self):
         self._max_len = 0
-        item_str = self._repr_helper(self.values, depth=len(self.shape))
+        item_str = self._repr_helper(self.values, depth=self.dim())
         if self.label:
-            return f"ValueArray(\n    {item_str},\n\n    label='{self.label}'\n)"
+            if self.dim() < 3:
+                return f"ValueArray(\n    {item_str},\n    label='{self.label}'\n)"
+            else:
+                return f"ValueArray(\n    {item_str},\n\n    label='{self.label}'\n)"
         else:
             return f"ValueArray(\n    {item_str}\n)"
 
@@ -133,7 +138,7 @@ class ValueArray:
             return "[" + ", ".join(str_data) + "]"
         else:
             newlines = '\n' * (depth - 1)
-            spaces = ' ' * (5 + len(self.shape) - depth)
+            spaces = ' ' * (5 + self.dim() - depth)
             join_str = f",{newlines}{spaces}"
             return "[" + join_str.join(self._repr_helper(item, depth - 1) for item in data) + "]"
 
@@ -159,11 +164,11 @@ def _create_zeros_array(shape):
         return [_create_zeros_array(shape[1:]) for _ in range(shape[0])]
 
 
-def _randomize_values(data):
-    if isinstance(data[0], list):
-        return [_randomize_values(subdata) for subdata in data]
+def _create_random_array(shape, mean=0, std=1):
+    if len(shape) == 1:
+        return [Value(random.gauss(mean, std)) for _ in range(shape[0])]
     else:
-        return [Value(random.gauss(0, 1)) for _ in range(len(data))]
+        return [_create_random_array(shape[1:], mean, std) for _ in range(shape[0])]
 
 
 def _get_shape_from_data(data):
