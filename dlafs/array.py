@@ -16,53 +16,12 @@ class ValueArray:
     understand.
     """
 
-    def __init__(self, shape):
-        self.shape = shape
-        self.values = self._create_array(self.shape)
-
-    def _create_array(self, shape):
-        if len(shape) == 1:
-            return [Value(0) for x in range(shape[0])]
-        elif len(shape) > 1:  # works recursively
-            return [self._create_array(shape[1:]) for _ in range(shape[0])]
-
-    @classmethod
-    def random(cls, shape):
-        """Create Array of random values from a normal dist with mean 0 and std 1"""
-        instance = cls(shape)
-        instance.values = _randomize_values(instance.values)
-        instance.shape = tuple(instance._get_shape_from_data(instance.values))
-        return instance
-
-    @classmethod
-    def from_numpy(cls, data):
-        """Create an Array from a numpy array"""
-        data = np_array_to_list_of_values(data)
-        return cls.from_list(data)
-
-    @classmethod
-    def from_list(cls, data):
-        """Create an Array from a list (potentially nested)"""
-        shape = tuple(cls._get_shape_from_data(data))
-        instance = cls(shape)
-        instance._set_data_from_list(data)
-        return instance
-
-    @staticmethod
-    def _get_shape_from_data(data):
-        """Recursively find the shape of the nested list"""
-        if not isinstance(data, list):
-            return []
-        else:
-            shape = None
-            for item in data:
-                if shape is None:
-                    shape = ValueArray._get_shape_from_data(item)
-                else:
-                    new_shape = ValueArray._get_shape_from_data(item)
-                    if new_shape != shape:
-                        raise ValueError("Array has inconsistent shape.")
-            return [len(data)] + shape
+    def __init__(self, data, label=''):
+        """Initialize the Array with the given data"""
+        self.shape = tuple(_get_shape_from_data(data))
+        self.values = _create_array(self.shape)
+        self._set_data_from_list(data)
+        self.label = label
 
     def _set_data_from_list(self, data, i=None):
         """Recursively set data from nested list"""
@@ -81,11 +40,31 @@ class ValueArray:
                 val = Value(val) if not isinstance(val, Value) else val
                 target_data[current_index[-1]] = val
 
+    @classmethod
+    def zeros(cls, shape, label=''):
+        """Create Array of zeros"""
+        data = _create_array(shape)
+        return cls(data, label)
+
+    @classmethod
+    def random(cls, shape, label=''):
+        """Create Array of random values from a normal dist with mean 0 and std 1"""
+        instance = cls.zeros(shape, label)
+        instance.values = _randomize_values(instance.values)
+        instance.shape = tuple(_get_shape_from_data(instance.values))
+        return instance
+
+    @classmethod
+    def from_numpy(cls, data, label=''):
+        """Create an Array from a numpy array"""
+        data = np_array_to_list_of_values(data)
+        return cls(data, label)
+
     def to_numpy(self):
         """Convert the Array to a numpy array"""
         return list_of_values_to_np_array(self.values)
 
-    def to_list(self, preserve_dtype=False):
+    def to_list(self):
         """Convert the Array to a nested list"""
         return self.to_numpy().tolist()
 
@@ -99,7 +78,7 @@ class ValueArray:
             index = (index,)
         item = self._recursive_getitem(self.values, index)
         if isinstance(item, list):  # Convert the list to an Array
-            return ValueArray.from_list(item)
+            return ValueArray(item)
         return item
 
     def _recursive_getitem(self, data, indices):
@@ -126,7 +105,7 @@ class ValueArray:
             index = index + (slice(None),)
 
         data = self._recursive_setitem(self.values, index, value)
-        new_shape = tuple(self._get_shape_from_data(data))
+        new_shape = tuple(_get_shape_from_data(data))
         if new_shape != self.shape:
             raise ValueError(f"Can't reshape data using setitem.")
 
@@ -157,7 +136,11 @@ class ValueArray:
 
     def __repr__(self):
         self._max_len = 0
-        return f"ValueArray(\n    {self._repr_helper(self.values, depth=len(self.shape))}\n)"
+        item_str = self._repr_helper(self.values, depth=len(self.shape))
+        if self.label:
+            return f"ValueArray(\n    {item_str},\n\n    label='{self.label}'\n)"
+        else:
+            return f"ValueArray(\n    {item_str}\n)"
 
     def _repr_helper(self, data, depth):
         if depth == 1:  # Base case: innermost list
@@ -173,11 +156,42 @@ class ValueArray:
             return "[" + join_str.join(self._repr_helper(item, depth - 1) for item in data) + "]"
 
 
+def _create_array(shape):
+    if len(shape) == 1:
+        return [Value(0) for x in range(shape[0])]
+    elif len(shape) > 1:  # works recursively
+        return [_create_array(shape[1:]) for _ in range(shape[0])]
+
+
+def _randomize_values(data):
+    if isinstance(data[0], list):
+        return [_randomize_values(subdata) for subdata in data]
+    else:
+        return [Value(random.gauss(0, 1)) for _ in range(len(data))]
+
+
+def _get_shape_from_data(data):
+    """Recursively find the shape of the nested list"""
+    if not isinstance(data, list):
+        return []
+    else:
+        shape = None
+        for item in data:
+            if shape is None:
+                shape = _get_shape_from_data(item)
+            else:
+                new_shape = _get_shape_from_data(item)
+                if new_shape != shape:
+                    raise ValueError("Array has inconsistent shape.")
+        return [len(data)] + shape
+
+
 def _convert_slice_to_range(slice_obj, data):
     return range(*slice_obj.indices(len(data)))
 
 
 def _verify_integrity(current_idx, value):
+    """Verify that the shape of the value matches the shape of the slice when setting data"""
     if not isinstance(current_idx, Sequence):
         current_idx = [current_idx]
     if not isinstance(value, Sequence):
@@ -188,10 +202,3 @@ def _verify_integrity(current_idx, value):
             f"Shape mismatch: Trying to set data of lenth {len(value)} "
             f"on slice of length {len(current_idx)}"
         )
-
-
-def _randomize_values(data):
-    if isinstance(data[0], list):
-        return [_randomize_values(subdata) for subdata in data]
-    else:
-        return [Value(random.gauss(0, 1)) for _ in range(len(data))]

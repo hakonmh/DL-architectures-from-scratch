@@ -19,9 +19,9 @@ from dlafs import Value as V
     ],
     ids=['(1, )', '(3, )', '(1, 1)', '(2, 2)', '(3, 1, 2)', '(1, 2, 1, 2)']
 )
-def test_valuearray_init(shape, expected):
+def test_valuearray_zeros(shape, expected):
     # Act
-    actual = ValueArray(shape)
+    actual = ValueArray.zeros(shape)
     # Assert
     assert actual.values == expected
     assert actual.to_numpy().shape == shape
@@ -37,7 +37,6 @@ def test_valuearray_random():
     ]
     # Act
     actual = ValueArray.random((3, 2))
-    print(actual)
     # Assert
     assert actual.shape == (3, 2)
     for row, exp_row in zip(actual.values, expected):
@@ -60,7 +59,7 @@ def test_from_list(input_list):
     # Arrange
     expected = convert_list_items_to_value(input_list)
     # Act
-    actual = ValueArray.from_list(input_list)
+    actual = ValueArray(input_list)
     # Assert
     assert actual.values == expected
 
@@ -88,7 +87,7 @@ def test_from_numpy(input_list):
 
 def test_to_numpy():
     # Arrange
-    varray = ValueArray((2, 2, 3))
+    varray = ValueArray.zeros((2, 2, 3))
     expected = np.zeros((2, 2, 3))
     # Act
     actual = varray.to_numpy()
@@ -154,8 +153,8 @@ TEST_SETITEM_ARGS = {  # num_dims: [(index, values), ...]
         ([[0, 2], 0, 0, 0], [5, 5]),
         ([1, 2, [0, 2], 0], [5, 5]),
         ([0, 1, slice(None)], [[5, 5, 5, 5]] * 4),
-        ([slice(None), slice(None), slice(None), slice(None)], ValueArray((4, 4, 4, 4)).to_list()),
-        ([slice(None), slice(None)], ValueArray((4, 4, 4, 4)).to_list()),
+        ([slice(None), slice(None), slice(None), slice(None)], ValueArray.zeros((4, 4, 4, 4)).to_list()),
+        ([slice(None), slice(None)], ValueArray.zeros((4, 4, 4, 4)).to_list()),
     ]
 }
 
