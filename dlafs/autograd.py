@@ -8,7 +8,10 @@ class Value:
 
     def __new__(cls, data, label=''):
         if isinstance(data, Value):
-            return copy.copy(data)
+            instance = copy.copy(data)
+            if label:
+                instance.label = label
+            return instance
         else:
             return super().__new__(cls)
 
@@ -73,7 +76,10 @@ class Value:
 
         def _backward():
             self.grad += (other.data * self.data**(other.data - 1)) * out.grad
-            other.grad += (out.data * math.log(self.data)) * out.grad
+            try:
+                other.grad += (out.data * math.log(self.data)) * out.grad
+            except ValueError:
+                other.grad += 0
         out._backward = _backward
         return out
 
