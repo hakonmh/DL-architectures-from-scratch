@@ -18,32 +18,14 @@ class ValueArray:
 
     def __init__(self, data, label=''):
         """Initialize the Array with the given data"""
-        self.shape = tuple(_get_shape_from_data(data))
-        self.values = _create_array(self.shape)
-        self._set_data_from_list(data)
+        self.values = _create_array_from_data(data, label)
+        self.shape = tuple(_get_shape_from_data(self.values))
         self.label = label
-
-    def _set_data_from_list(self, data, i=None):
-        """Recursively set data from nested list"""
-        if i is None:
-            i = []
-
-        for idx, val in enumerate(data):
-            current_index = i + [idx]
-
-            if isinstance(val, list):
-                self._set_data_from_list(val, current_index)
-            else:
-                target_data = self.values
-                for ind in current_index[:-1]:  # navigate to the target list
-                    target_data = target_data[ind]
-                val = Value(val) if not isinstance(val, Value) else val
-                target_data[current_index[-1]] = val
 
     @classmethod
     def zeros(cls, shape, label=''):
         """Create Array of zeros"""
-        data = _create_array(shape)
+        data = _create_zeros_array(shape)
         return cls(data, label)
 
     @classmethod
@@ -156,11 +138,25 @@ class ValueArray:
             return "[" + join_str.join(self._repr_helper(item, depth - 1) for item in data) + "]"
 
 
-def _create_array(shape):
+def _create_array_from_data(data, label=''):
+    """Create an Array from a nested list"""
+    if not isinstance(data[0], Sequence):
+        if label:
+            return [Value(data[i], label=f'{label}_{i+1}') for i in range(len(data))]
+        else:
+            return [Value(data[i]) for i in range(len(data))]
+    else:
+        if label:
+            return [_create_array_from_data(data[i], label=f'{label}_{i+1}') for i in range(len(data))]
+        else:
+            return [_create_array_from_data(data[i]) for i in range(len(data))]
+
+
+def _create_zeros_array(shape):
     if len(shape) == 1:
-        return [Value(0) for x in range(shape[0])]
+        return [0 for _ in range(shape[0])]
     elif len(shape) > 1:  # works recursively
-        return [_create_array(shape[1:]) for _ in range(shape[0])]
+        return [_create_zeros_array(shape[1:]) for _ in range(shape[0])]
 
 
 def _randomize_values(data):
