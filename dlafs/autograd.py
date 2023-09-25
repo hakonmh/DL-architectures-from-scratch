@@ -1,5 +1,4 @@
 import math
-import copy
 from numbers import Number
 from dlafs._utils import format_float_string
 
@@ -8,7 +7,7 @@ class Value:
 
     def __new__(cls, data, label=''):
         if isinstance(data, Value):
-            instance = copy.copy(data)
+            instance = data
             if label:
                 instance.label = label
             return instance
@@ -47,7 +46,7 @@ class Value:
             return f"Value({value}, grad={grad})"
 
     def __add__(self, other):
-        other = other if isinstance(other, Value) else Value(other)  # Convert to Value if needed
+        other = Value(other)  # Convert to Value if needed
         out = Value._from_operation(self.data + other.data, (self, other), '+')
 
         def _backward():
@@ -61,7 +60,7 @@ class Value:
         return self + (-other)
 
     def __mul__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
+        other = Value(other)
         out = Value._from_operation(self.data * other.data, (self, other), '*')
 
         def _backward():
@@ -71,7 +70,7 @@ class Value:
         return out
 
     def __pow__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
+        other = Value(other)
         out = Value._from_operation(self.data ** other.data, (self, other), '**')
 
         def _backward():
