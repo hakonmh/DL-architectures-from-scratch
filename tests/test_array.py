@@ -36,7 +36,7 @@ def test_valuearray_random():
         [V(-1.016349), V(-0.07212)]
     ]
     # Act
-    actual = ValueArray.random((3, 2))
+    actual = ValueArray.random_normal((3, 2))
     # Assert
     assert actual.shape == (3, 2)
     for row, exp_row in zip(actual.values, expected):
