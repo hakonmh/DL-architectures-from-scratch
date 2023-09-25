@@ -25,13 +25,19 @@ class ValueArray:
     @classmethod
     def zeros(cls, shape, label=''):
         """Create Array of zeros"""
-        data = _create_zeros_array(shape)
+        data = _create_zeros_data(shape)
         return cls(data, label)
 
     @classmethod
-    def random(cls, shape, label='', mean=0, std=1):
+    def random_normal(cls, shape, label='', mean=0, std=1):
         """Create Array of random values from a normal dist with mean 0 and std 1"""
-        data = _create_random_array(shape, mean, std)
+        data = _create_random_normal_data(shape, mean, std)
+        return cls(data, label)
+
+    @classmethod
+    def random_uniform(cls, shape, label='', lower=0, upper=1):
+        """Create Array of random values from a uniform dist between lower and upper"""
+        data = _create_random_uniform_data(shape, lower, upper)
         return cls(data, label)
 
     @classmethod
@@ -157,18 +163,25 @@ def _create_array_from_data(data, label=''):
             return [_create_array_from_data(data[i]) for i in range(len(data))]
 
 
-def _create_zeros_array(shape):
+def _create_zeros_data(shape):
     if len(shape) == 1:
         return [0 for _ in range(shape[0])]
     elif len(shape) > 1:  # works recursively
-        return [_create_zeros_array(shape[1:]) for _ in range(shape[0])]
+        return [_create_zeros_data(shape[1:]) for _ in range(shape[0])]
 
 
-def _create_random_array(shape, mean=0, std=1):
+def _create_random_normal_data(shape, mean=0, std=1):
     if len(shape) == 1:
         return [Value(random.gauss(mean, std)) for _ in range(shape[0])]
     else:
-        return [_create_random_array(shape[1:], mean, std) for _ in range(shape[0])]
+        return [_create_random_normal_data(shape[1:], mean, std) for _ in range(shape[0])]
+
+
+def _create_random_uniform_data(shape, lower=0, upper=1):
+    if len(shape) == 1:
+        return [Value(random.uniform(lower, upper)) for _ in range(shape[0])]
+    else:
+        return [_create_random_uniform_data(shape[1:], lower, upper) for _ in range(shape[0])]
 
 
 def _get_shape_from_data(data):
