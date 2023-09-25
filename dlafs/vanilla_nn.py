@@ -1,5 +1,6 @@
 import random
 from dlafs.autograd import Value
+from dlafs.array import ValueArray
 
 
 class Module:
@@ -17,7 +18,7 @@ class Neuron(Module):
 
     def __init__(self, num_inputs, activation='tanh'):
         """Initialize the weights and bias randomly, and set the activation function"""
-        self.w = [Value(random.uniform(-1, 1), label=f'w_{i+1}') for i in range(num_inputs)]
+        self.w = ValueArray([Value(random.uniform(-1, 1), label=f'w_{i+1}') for i in range(num_inputs)])
         self.b = Value(random.uniform(-1, 1), label='b')
         self.activation = activation
 
@@ -40,13 +41,15 @@ class Neuron(Module):
 
     def parameters(self):
         """Return the weights and bias as a list"""
-        return self.w + [self.b]
+        return self.w.values + [self.b]
 
     def __repr__(self):
         if self.activation == 'tanh':
             neuron_type = 'Tanh'
         elif self.activation == 'relu':
             neuron_type = 'ReLU'
+        elif self.activation == 'sigmoid':
+            neuron_type = 'Sigmoid'
         else:
             neuron_type = 'Linear'
         return f'{neuron_type}Neuron({len(self.w)})'
