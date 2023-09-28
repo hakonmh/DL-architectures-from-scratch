@@ -40,10 +40,14 @@ class Value:
     def __repr__(self):
         value = format_float_string(self.data)
         grad = format_float_string(self.grad)
-        if hasattr(self, 'label') and self.label:
-            return f"Value({value}, grad={grad}, label={self.label})"
+        if self.grad == 0:
+            grad_str = ''
         else:
-            return f"Value({value}, grad={grad})"
+            grad_str = f', grad={grad}'
+        if self.label:
+            return f"Value({value}{grad_str}, label={self.label})"
+        else:
+            return f"Value({value}{grad_str})"
 
     def __add__(self, other):
         other = Value(other)  # Convert to Value if needed
