@@ -133,6 +133,17 @@ class ValueArray:
             )
         return data
 
+    def zero_grad(self):
+        """Reset the gradients to zero"""
+        self._recursive_zero_grad(self.values)
+
+    def _recursive_zero_grad(self, data):
+        if isinstance(data, Value):
+            data.grad = 0
+        else:
+            for item in data:
+                self._recursive_zero_grad(item)
+
     def __repr__(self):
         self._max_len = 0
         item_str = self._repr_helper(self.values, depth=self.dim())
