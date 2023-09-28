@@ -16,6 +16,15 @@ class ValueArray:
     understand.
     """
 
+    def __new__(cls, data, label=''):
+        if isinstance(data, ValueArray):
+            instance = data
+            if label:
+                instance.label = label
+            return instance
+        else:
+            return super().__new__(cls)
+
     def __init__(self, data, label=''):
         """Initialize the Array with the given data"""
         self.values = _create_array_from_data(data, label)
