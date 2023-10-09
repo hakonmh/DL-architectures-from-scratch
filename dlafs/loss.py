@@ -89,7 +89,6 @@ def multi_cross_entropy(y_true, y_pred):
             true_ij = true_i[j].item()
             sample_loss = true_ij * pred_ij.log()
             loss -= sample_loss
-    print(loss)
     return loss / num_samples
 
 
