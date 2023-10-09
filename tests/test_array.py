@@ -53,13 +53,30 @@ def test_valuearray_random():
         [[1, ]],
         [[[[V(1), V(2)], [V(3), V(4)]], [[V(5), V(6)], [V(7), V(8)]]]],
     ],
-    ids=['single int', 'single value', '1D float', '2D int', '4D value']
+    ids=['0D int', 'single value', '1D float', '2D int', '4D value']
 )
-def test_from_list(input_list):
+def test_init_from_sequence(input_list):
     # Arrange
     expected = convert_list_items_to_value(input_list)
     # Act
     actual = ValueArray(input_list)
+    # Assert
+    assert actual.values == expected
+
+
+@pytest.mark.parametrize(
+    'input_scalar',
+    [
+        V(0.5),
+        4.2,
+        -9
+    ]
+)
+def test_init_from_scalar(input_scalar):
+    # Arrange
+    expected = [convert_list_items_to_value(input_scalar)]
+    # Act
+    actual = ValueArray(input_scalar)
     # Assert
     assert actual.values == expected
 

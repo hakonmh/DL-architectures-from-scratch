@@ -63,6 +63,16 @@ class ValueArray:
         """Convert the Array to a nested list"""
         return self.to_numpy().tolist()
 
+    def item(self):
+        """Return the value of the Array as a Value scalar"""
+        if max(self.shape) == 1:
+            item = self.values
+            for _ in range(self.dim()):
+                item = item[0]
+            return item
+        else:
+            raise ValueError("Can't convert Array to a scalar.")
+
     def __len__(self):
         """Return the length of the Array"""
         return len(self.values)
@@ -171,6 +181,8 @@ class ValueArray:
 
 def _create_array_from_data(data, label=''):
     """Create an Array from a nested list"""
+    if not isinstance(data, Sequence):
+        return [Value(data, label=label)]
     if not isinstance(data[0], Sequence):
         if label:
             return [Value(data[i], label=f'{label}_{i+1}') for i in range(len(data))]

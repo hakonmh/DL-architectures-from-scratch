@@ -27,6 +27,10 @@ class Value:
         self.label = label
         self._backward = lambda: None
 
+    def item(self):
+        """Return self, a convenience method for working with ValueArray.item()"""
+        return self
+
     @classmethod
     def _from_operation(cls, data, children, operator):
         """Create new object from an operation which stores the operator and operands used
@@ -114,7 +118,10 @@ class Value:
         return out
 
     def log(self):
-        out = Value._from_operation(math.log(self.data), (self, ), 'log')
+        try:
+            out = Value._from_operation(math.log(self.data), (self, ), 'log')
+        except ValueError:
+            out = Value._from_operation(float('-inf'), (self, ), 'log')
 
         def _backward():
             self.grad += (1 / self.data) * out.grad
@@ -168,6 +175,26 @@ class Value:
         if not isinstance(other, Value):
             return False
         return self.data == other.data and self.grad == other.grad
+
+    def __gt__(self, other):
+        if not isinstance(other, Value):
+            other = Value(other)
+        return self.data > other.data
+
+    def __lt__(self, other):
+        if not isinstance(other, Value):
+            other = Value(other)
+        return self.data < other.data
+
+    def __ge__(self, other):
+        if not isinstance(other, Value):
+            other = Value(other)
+        return self.data >= other.data
+
+    def __le__(self, other):
+        if not isinstance(other, Value):
+            other = Value(other)
+        return self.data <= other.data
 
     def __hash__(self):
         return hash(id(self))
