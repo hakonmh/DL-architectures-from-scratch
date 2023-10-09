@@ -1,4 +1,6 @@
 import math
+from dlafs.array import ValueArray
+from dlafs.autograd import Value
 
 
 def mse(y_true, y_pred):
@@ -9,14 +11,9 @@ def mse(y_true, y_pred):
     MSE is defined as:
         mse = sum((y_j - pred_j)**2 for j in num_samples) / num_samples
     """
-    # Convert inputs to lists of values if they are scalars
-    if not hasattr(y_true, '__iter__'):
-        y_true = [y_true]
-    if not hasattr(y_pred, '__iter__'):
-        y_pred = [y_pred]
-
+    y_true, y_pred = _coerce_single_dim_args(y_true, y_pred)
     num_items = len(y_true)
-    return sum((y_i - pred_i)**2 for y_i, pred_i in zip(y_true, y_pred)) / num_items
+    return sum((y_i.item() - pred_i.item())**2 for y_i, pred_i in zip(y_true, y_pred)) / num_items
 
 
 def accuracy(y_true, y_pred):
@@ -28,11 +25,7 @@ def accuracy(y_true, y_pred):
     The input values should be integers representing the class labels, not one-hot encoded
     vectors.
     """
-    # Convert inputs to lists of values if they are scalars
-    if not hasattr(y_true, '__iter__'):
-        y_true = [y_true]
-    if not hasattr(y_pred, '__iter__'):
-        y_pred = [y_pred]
+    y_true, y_pred = _coerce_single_dim_args(y_true, y_pred)
 
     num_items = len(y_true)
     num_correct = sum((y_i == pred_i) for y_i, pred_i in zip(y_true, y_pred))
@@ -40,35 +33,103 @@ def accuracy(y_true, y_pred):
 
 
 def cross_entropy(y_true, y_pred):
+    """Detects whether the inputs are binary or multi-class and chooses the correct cross entropy variant.
+
+    The inputs should be in the shape (num_samples, num_classes), 1D inputs are converted
+    to (1, num_classes).
+    """
+    y_true, y_pred = _coerce_multi_dim_args(y_true, y_pred)
+    if y_pred.shape[1] == 1:
+        # Binary classification
+        loss = binary_cross_entropy(y_true, y_pred)
+    else:
+        # Multi-class classification
+        loss = multi_cross_entropy(y_true, y_pred)
+    return loss
+
+
+def binary_cross_entropy(y_true, y_pred):
+    """Calculate the binary cross entropy between true and predicted values.
+
+    Binary cross entropy is minimized when the predicted value is equal to the true value.
+
+    The inputs should be in the shape (num_samples, 1). 1D inputs are converted to
+    (num_samples, 1).
+    """
+    y_true, y_pred = _coerce_single_dim_args(y_true, y_pred)
+
+    loss = 0.0
+    num_samples = len(y_true)
+    for i in range(num_samples):
+        pred_i = y_pred[i].item()
+        true_i = y_true[i].item()
+        sample_loss = true_i * pred_i.log() + (1 - true_i) * (1 - pred_i).log()
+        sample_loss = max(sample_loss, -100)  # Prevent overflow
+        loss -= sample_loss
+    return loss / num_samples
+
+
+def multi_cross_entropy(y_true, y_pred):
     """Calculate the categorical (multi-class) cross entropy between true and predicted values.
 
     Cross entropy is minimized when the predicted value of the correct class
     is 1 and the predicted value of all other classes is 0.
 
-    The cross entropy loss for one sample is defined as:
-        h(y, y_pred) = -sum(y_i * log(pred_i) for i in num_classes)
-    The cross entropy loss for multiple samples it is defined as:
-        cross_entropy = sum(h(y_j, y_pred_j) for j in num_samples) / num_samples
+    The inputs should be in the shape (num_samples, num_classes). 1D inputs are converted to
+    (1, num_classes).
     """
-    # Inputs should be a list of lists, where each inner list is one sample.
-    if not hasattr(y_true[0], '__iter__'):
-        y_true = [y_true]
-    if not hasattr(y_pred[0], '__iter__'):
-        y_pred = [y_pred]
-
-    EPSILON = 1e-15
+    y_true, y_pred = _coerce_multi_dim_args(y_true, y_pred)
     loss = 0.0
     num_samples = len(y_true)
     for i in range(num_samples):
-        num_classes = len(y_true[i])
+        true_i = y_true[i]
+        num_classes = len(true_i)
         for j in range(num_classes):
-            pred_ij = y_pred[i][j]
-            try:
-                # Add epsilon to avoid log(0)
-                pred_ij = pred_ij if pred_ij.data > EPSILON else pred_ij + EPSILON
-                loss += -y_true[i][j] * pred_ij.log()
-            except AttributeError:  # Values are not Value objects
-                # Add epsilon to avoid log(0)
-                pred_ij = max(pred_ij, EPSILON)
-                loss += -y_true[i][j] * math.log(pred_ij)
+            pred_ij = y_pred[i][j].item() + 1e-50
+            true_ij = true_i[j].item()
+            sample_loss = true_ij * pred_ij.log()
+            loss -= sample_loss
+    print(loss)
     return loss / num_samples
+
+
+def _coerce_single_dim_args(y_true, y_pred):
+    """Coerce the arguments to the correct types and shapes.
+
+    1. Convert sequences to ValueArray
+    2. Add extra dim to single sample
+    """
+    if not isinstance(y_true, ValueArray):
+        y_true = ValueArray(y_true)
+    if y_true.dim() < 1:
+        y_true = [y_true.values]
+        y_true = ValueArray(y_true)
+
+    if not isinstance(y_pred, ValueArray):
+        y_pred = ValueArray(y_pred)
+    if y_pred.dim() < 1:
+        y_pred = [y_pred.values]
+        y_pred = ValueArray(y_pred)
+
+    return y_true, y_pred
+
+
+def _coerce_multi_dim_args(y_true, y_pred):
+    """Coerce the arguments to the correct types and shapes.
+
+    1. Convert sequences to ValueArray
+    2. Add extra dim to single sample
+    """
+    if not isinstance(y_true, ValueArray):
+        y_true = ValueArray(y_true)
+    if y_true.dim() < 2:
+        y_true = [y_true.values]
+        y_true = ValueArray(y_true)
+
+    if not isinstance(y_pred, ValueArray):
+        y_pred = ValueArray(y_pred)
+    if y_pred.dim() < 2:
+        y_pred = [y_pred.values]
+        y_pred = ValueArray(y_pred)
+
+    return y_true, y_pred
