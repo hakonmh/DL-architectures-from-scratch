@@ -21,12 +21,16 @@ class ValueArray:
             instance = data
             if label:
                 instance.label = label
+                instance.values = _create_array_from_data(instance.values, label)
             return instance
         else:
             return super().__new__(cls)
 
     def __init__(self, data, label=''):
         """Initialize the Array with the given data"""
+        if isinstance(data, ValueArray):
+            return
+
         self.values = _create_array_from_data(data, label)
         self.shape = tuple(_get_shape_from_data(self.values))
         self.label = label
@@ -44,9 +48,9 @@ class ValueArray:
         return cls(data, label)
 
     @classmethod
-    def random_uniform(cls, shape, label='', lower=0, upper=1):
-        """Create Array of random values from a uniform dist between lower and upper"""
-        data = _create_random_uniform_data(shape, lower, upper)
+    def random_uniform(cls, shape, label='', low=0, high=1):
+        """Create Array of random values from a uniform dist between low and high"""
+        data = _create_random_uniform_data(shape, low, high)
         return cls(data, label)
 
     @classmethod
@@ -209,11 +213,11 @@ def _create_random_normal_data(shape, mean=0, std=1):
         return [_create_random_normal_data(shape[1:], mean, std) for _ in range(shape[0])]
 
 
-def _create_random_uniform_data(shape, lower=0, upper=1):
+def _create_random_uniform_data(shape, low=0, high=1):
     if len(shape) == 1:
-        return [Value(random.uniform(lower, upper)) for _ in range(shape[0])]
+        return [Value(random.uniform(low, high)) for _ in range(shape[0])]
     else:
-        return [_create_random_uniform_data(shape[1:], lower, upper) for _ in range(shape[0])]
+        return [_create_random_uniform_data(shape[1:], low, high) for _ in range(shape[0])]
 
 
 def _get_shape_from_data(data):

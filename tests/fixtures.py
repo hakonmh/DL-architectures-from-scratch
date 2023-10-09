@@ -1,6 +1,6 @@
 import math
 import torch
-from dlafs import Value
+from dlafs import Value, ValueArray
 
 
 def assert_grads_equal_expected(values, expected_grads):
@@ -12,6 +12,8 @@ def assert_grads_equal_expected(values, expected_grads):
 
 def convert_list_items_to_value(data):
     """Recursive function to create valuearray from nested list"""
+    if isinstance(data, ValueArray):
+        data = data.values
     if isinstance(data, list):
         return [convert_list_items_to_value(item) for item in data]
     else:

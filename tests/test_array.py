@@ -52,8 +52,9 @@ def test_valuearray_random():
         [1.01, 2.02],
         [[1, ]],
         [[[[V(1), V(2)], [V(3), V(4)]], [[V(5), V(6)], [V(7), V(8)]]]],
+        ValueArray([[1, 2], [3, 4]])
     ],
-    ids=['0D int', 'single value', '1D float', '2D int', '4D value']
+    ids=['0D-int', 'single-value', '1D-float', '2D-int', '4D-value', '2D-valuearray']
 )
 def test_init_from_sequence(input_list):
     # Arrange
@@ -89,7 +90,7 @@ def test_init_from_scalar(input_scalar):
         [[1, ]],
         [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]],
     ],
-    ids=['single', '1D float', '2D', '4D']
+    ids=['single', '1D-float', '2D', '4D']
 )
 def test_from_numpy(input_list):
     # Arrange
