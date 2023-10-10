@@ -9,7 +9,7 @@ from dlafs.helpers import (
 from dlafs._utils import format_float_string
 
 
-class ValueArray:
+class ValueArray(Sequence):
     """A class for representing a multidimensional array of Value() objects.
 
     Only indexing methods are implemented, so the class is not important to
@@ -85,6 +85,19 @@ class ValueArray:
         """Return the number of dimensions of the Array"""
         return len(self.shape)
 
+    def __contains__(self, item):
+        """Return whether the Array contains the given item"""
+        return self._recursive_contains(self.values, item)
+
+    def _recursive_contains(self, data, item):
+        if isinstance(data, Value):
+            if isinstance(item, Value):
+                return data == item
+            else:
+                return data.data == item
+        else:
+            return any(self._recursive_contains(subdata, item) for subdata in data)
+
     def __getitem__(self, index):
         """Get an item from the Array using the given index"""
         if not isinstance(index, tuple):
@@ -159,7 +172,7 @@ class ValueArray:
                 self._recursive_zero_grad(item)
 
     def __repr__(self):
-        self._max_len = 0
+        self._max_str_len = _get_max_str_len(self.values, max_len=0)
         item_str = self._repr_helper(self.values, depth=self.dim())
         if self.label:
             if self.dim() < 3:
@@ -172,9 +185,7 @@ class ValueArray:
     def _repr_helper(self, data, depth):
         if depth == 1:  # Base case: innermost list
             str_data = [format_float_string(val.data) for val in data]
-            # Add spaces to align the strings
-            self._max_len = max(max(len(val) for val in str_data), self._max_len)
-            str_data = [val + ' ' * (self._max_len - len(val)) for val in str_data]
+            str_data = [' ' * (self._max_str_len - len(val)) + val for val in str_data]
             return "[" + ", ".join(str_data) + "]"
         else:
             newlines = '\n' * (depth - 1)
@@ -252,3 +263,13 @@ def _verify_integrity(current_idx, value):
             f"Shape mismatch: Trying to set data of lenth {len(value)} "
             f"on slice of length {len(current_idx)}"
         )
+
+
+def _get_max_str_len(data, max_len=0):
+    """Recursively find the longest number in a nested list"""
+    if not isinstance(data, list):
+        return max(max_len, len(format_float_string(data.data)))
+    else:
+        for item in data:
+            max_len = _get_max_str_len(item, max_len)
+        return max_len

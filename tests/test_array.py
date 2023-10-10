@@ -52,9 +52,10 @@ def test_valuearray_random():
         [1.01, 2.02],
         [[1, ]],
         [[[[V(1), V(2)], [V(3), V(4)]], [[V(5), V(6)], [V(7), V(8)]]]],
-        ValueArray([[1, 2], [3, 4]])
+        ValueArray([[1, 2], [3, 4]]),
+        [ValueArray([[1, 2], [3, 4]]), ValueArray([[5, 6], [7, 8]])],
     ],
-    ids=['0D-int', 'single-value', '1D-float', '2D-int', '4D-value', '2D-valuearray']
+    ids=['0D-int', 'single-value', '1D-float', '2D-int', '4D-value', '2D-valuearray', 'List-of-ValueArray']
 )
 def test_init_from_sequence(input_list):
     # Arrange
@@ -226,3 +227,16 @@ def test_setitem_exeptions(index, values, exception):
 def _create_array(num_dims, size=4):
     shape = [size] * num_dims
     return np.arange(np.prod(shape)).reshape(shape)
+
+
+def test_contains():
+    # Arrange
+    varray = ValueArray([[[2, 7], [5, -4]], [[0, 1], [1, 5]]])
+    # Act
+    five_in_varray = 5 in varray
+    value_in_array = V(5) in varray
+    ten_in_varray = 10 in varray
+    # Assert
+    assert five_in_varray
+    assert value_in_array
+    assert not ten_in_varray
