@@ -129,12 +129,11 @@ class Value:
         return out
 
     def tanh(self):
-        x = self.data
-        tanh = (math.exp(2 * x) - 1) / (math.exp(2 * x) + 1)
-        out = Value._from_operation(tanh, (self, ), 'tanh')
+        # tanh = (math.exp(2 * x) - 1) / (math.exp(2 * x) + 1)
+        out = Value._from_operation(math.tanh(self.data), (self, ), 'tanh')
 
         def _backward():
-            self.grad += (1 - tanh**2) * out.grad
+            self.grad += (1 - out.data**2) * out.grad
         out._backward = _backward
         return out
 
