@@ -5,13 +5,17 @@ class Trainer:
         self.loss = loss
         self.learning_rate = learning_rate
 
-    def train(self, inputs, labels, num_iterations):
+    def train(self, inputs, labels, num_iterations, silent=False):
+        data = []
         for i in range(num_iterations):
             outputs = (self.model(xi) for xi in inputs)
             loss = self.loss(labels, outputs)
             loss.backward()
             update_weights(self.model, learning_rate=self.learning_rate)
-            print(f'{i}: {loss.data:.4f}')
+            if not silent:
+                print(f'{i}: {loss.data:.4f}')
+            data.append(loss.data)
+        return data
 
 
 def update_weights(model, learning_rate=1e-2):

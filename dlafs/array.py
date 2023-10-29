@@ -1,5 +1,6 @@
 import random
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
+from typing import Generator
 
 from dlafs.autograd import Value
 from dlafs.helpers import (
@@ -196,9 +197,12 @@ class ValueArray(Sequence):
 
 def _create_array_from_data(data, label=''):
     """Create an Array from a nested list"""
-    if not isinstance(data, Sequence):
+    if isinstance(data, Generator):
+        data = list(data)
+
+    if not isinstance(data, Iterable):
         return [Value(data, label=label)]
-    if not isinstance(data[0], Sequence):
+    if not isinstance(data[0], Iterable):
         if label:
             return [Value(data[i], label=f'{label}_{i+1}') for i in range(len(data))]
         else:
@@ -253,9 +257,9 @@ def _convert_slice_to_range(slice_obj, data):
 
 def _verify_integrity(current_idx, value):
     """Verify that the shape of the value matches the shape of the slice when setting data"""
-    if not isinstance(current_idx, Sequence):
+    if not isinstance(current_idx, Iterable):
         current_idx = [current_idx]
-    if not isinstance(value, Sequence):
+    if not isinstance(value, Iterable):
         value = [value]
 
     if not len(current_idx) == len(value):

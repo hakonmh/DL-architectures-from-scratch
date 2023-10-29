@@ -13,6 +13,9 @@ class Module:
     def parameters(self):
         return []
 
+
+class BaseNeuron(Module):
+
     def activation(self, input):
         if self._activation == 'tanh':
             out = input.tanh()
@@ -25,7 +28,7 @@ class Module:
         return out
 
 
-class Neuron(Module):
+class Neuron(BaseNeuron):
 
     def __init__(self, num_inputs, activation='tanh'):
         """Initialize the weights and bias randomly, and set the activation function"""
