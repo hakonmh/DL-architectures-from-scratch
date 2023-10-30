@@ -204,12 +204,12 @@ def _create_array_from_data(data, label=''):
         return [Value(data, label=label)]
     if not isinstance(data[0], Iterable):
         if label:
-            return [Value(data[i], label=f'{label}_{i+1}') for i in range(len(data))]
+            return [Value(data[i], label=f'{label}_{i}') for i in range(len(data))]
         else:
             return [Value(data[i]) for i in range(len(data))]
     else:
         if label:
-            return [_create_array_from_data(data[i], label=f'{label}_{i+1}') for i in range(len(data))]
+            return [_create_array_from_data(data[i], label=f'{label}_{i}') for i in range(len(data))]
         else:
             return [_create_array_from_data(data[i]) for i in range(len(data))]
 

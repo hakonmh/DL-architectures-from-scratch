@@ -2,8 +2,7 @@ import pytest
 import random
 
 from dlafs import ValueArray
-from dlafs.vanilla_nn import Layer
-from dlafs.rnn import *
+from dlafs.nn import *
 from dlafs.loss import mse
 
 

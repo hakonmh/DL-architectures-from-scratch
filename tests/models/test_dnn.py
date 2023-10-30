@@ -2,7 +2,7 @@ import pytest
 import random
 
 from dlafs import ValueArray
-from dlafs.vanilla_nn import *
+from dlafs.nn.dnn import *
 from dlafs.loss import binary_cross_entropy
 from dlafs.train import Trainer
 

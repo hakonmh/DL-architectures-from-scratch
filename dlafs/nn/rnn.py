@@ -1,6 +1,6 @@
 from dlafs.autograd import Value
 from dlafs.array import ValueArray
-from dlafs.vanilla_nn import Module, BaseNeuron
+from dlafs.nn.dnn import Module, BaseNeuron
 
 
 class RecurrentNeuron(BaseNeuron):

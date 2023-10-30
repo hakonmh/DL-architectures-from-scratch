@@ -49,7 +49,7 @@ class Value:
         else:
             grad_str = f', grad={grad}'
         if self.label:
-            return f"Value({value}{grad_str}, label={self.label})"
+            return f"Value({value}{grad_str}, label='{self.label}')"
         else:
             return f"Value({value}{grad_str})"
 
