@@ -1,6 +1,4 @@
-import math
 from dlafs.array import ValueArray
-from dlafs.autograd import Value
 
 
 def mse(y_true, y_pred):
@@ -33,7 +31,10 @@ def accuracy(y_true, y_pred):
 
 
 def cross_entropy(y_true, y_pred):
-    """Detects whether the inputs are binary or multi-class and chooses the correct cross entropy variant.
+    """Calculate the cross entropy between true and predicted values.
+
+    Detects whether the inputs are binary or multi-class and chooses the correct cross
+    entropy variant.
 
     The inputs should be in the shape (num_samples, num_classes), 1D inputs are converted
     to (1, num_classes).

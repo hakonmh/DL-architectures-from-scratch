@@ -1,6 +1,6 @@
 import pytest
 import math
-from dlafs import loss, ValueArray, Value as V
+from dlafs import loss, ValueArray as VA, Value as V
 
 
 @pytest.mark.parametrize(
@@ -63,7 +63,7 @@ def test_accuracy(y, yhat, expected):
             0.31216447973055683
         ),
         ([[1, ], [0, ], [1, ]], [[0.7, ], [0.1, ], [0.95, ]], 0.17110958466136975),
-        (ValueArray([[1, ], [0, ], [1, ]]), ValueArray([[0.7, ], [0.1, ], [0.95, ]]), 0.17110958466136975),
+        (VA([[1, ], [0, ], [1, ]]), VA([[0.7, ], [0.1, ], [0.95, ]]), 0.17110958466136975),
         (1, 0.7, 0.35667494393873245),
     ],
     ids=["int-one-sample", "value-one-sample", "int-multiple-samples", "binary-multiple-samples",

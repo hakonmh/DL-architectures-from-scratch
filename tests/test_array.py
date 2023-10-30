@@ -55,7 +55,8 @@ def test_valuearray_random():
         ValueArray([[1, 2], [3, 4]]),
         [ValueArray([[1, 2], [3, 4]]), ValueArray([[5, 6], [7, 8]])],
     ],
-    ids=['0D-int', 'single-value', '1D-float', '2D-int', '4D-value', '2D-valuearray', 'List-of-ValueArray']
+    ids=['0D-int', 'single-value', '1D-float', '2D-int',
+         '4D-value', '2D-valuearray', 'List-of-ValueArray']
 )
 def test_init_from_sequence(input_list):
     # Arrange
@@ -172,7 +173,10 @@ TEST_SETITEM_ARGS = {  # num_dims: [(index, values), ...]
         ([[0, 2], 0, 0, 0], [5, 5]),
         ([1, 2, [0, 2], 0], [5, 5]),
         ([0, 1, slice(None)], [[5, 5, 5, 5]] * 4),
-        ([slice(None), slice(None), slice(None), slice(None)], ValueArray.zeros((4, 4, 4, 4)).to_list()),
+        (
+            [slice(None), slice(None), slice(None), slice(None)],
+            ValueArray.zeros((4, 4, 4, 4)).to_list()
+        ),
         ([slice(None), slice(None)], ValueArray.zeros((4, 4, 4, 4)).to_list()),
     ]
 }

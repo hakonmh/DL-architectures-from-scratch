@@ -91,7 +91,7 @@ def test_equals():
     expected = Value(3)
 
     wrong_value = Value(4)
-    wrong_grad = Value(3); wrong_grad.grad = 1
+    wrong_grad = Value(3); wrong_grad.grad = 1  # noqa
     wrong_obj_type = 3
     # Assert
     assert actual == expected

@@ -134,7 +134,7 @@ class ValueArray(Sequence):
         data = self._recursive_setitem(self.values, index, value)
         new_shape = tuple(_get_shape_from_data(data))
         if new_shape != self.shape:
-            raise ValueError(f"Can't reshape data using setitem.")
+            raise ValueError("Can't reshape data using setitem.")
 
         self.values = data
 
@@ -209,7 +209,7 @@ def _create_array_from_data(data, label=''):
             return [Value(data[i]) for i in range(len(data))]
     else:
         if label:
-            return [_create_array_from_data(data[i], label=f'{label}_{i}') for i in range(len(data))]
+            return [_create_array_from_data(data[i], f'{label}_{i}') for i in range(len(data))]
         else:
             return [_create_array_from_data(data[i]) for i in range(len(data))]
 
