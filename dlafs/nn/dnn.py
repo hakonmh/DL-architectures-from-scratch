@@ -1,31 +1,7 @@
 import random
 from dlafs.autograd import Value
 from dlafs.array import ValueArray
-
-
-class Module:
-
-    def zero_grad(self):
-        """Reset the gradients to zero"""
-        for p in self.parameters():
-            p.grad = 0
-
-    def parameters(self):
-        return []
-
-
-class BaseNeuron(Module):
-
-    def activation(self, input):
-        if self._activation == 'tanh':
-            out = input.tanh()
-        elif self._activation == 'relu':
-            out = input.relu()
-        elif self._activation == 'sigmoid':
-            out = input.sigmoid()
-        else:
-            out = input
-        return out
+from dlafs.nn.common import Module, BaseNeuron, _format_activation_str
 
 
 class Neuron(BaseNeuron):
@@ -37,7 +13,7 @@ class Neuron(BaseNeuron):
 
         self.w = ValueArray.random_uniform((num_inputs, ), low=-1, high=1, label=f'w{neuron_id}')
         self.b = Value(random.uniform(-1, 1), label=f'b{neuron_id}')
-        self._activation = activation
+        self._activation = _format_activation_str(activation)
 
     def __call__(self, x):
         """The forward pass of a single neuron"""
@@ -54,20 +30,16 @@ class Neuron(BaseNeuron):
         return self.w.values + [self.b]
 
     def __repr__(self):
-        if self._activation == 'tanh':
-            neuron_type = 'Tanh'
-        elif self._activation == 'relu':
-            neuron_type = 'ReLU'
-        elif self._activation == 'sigmoid':
-            neuron_type = 'Sigmoid'
-        else:
-            neuron_type = 'Linear'
-        return f'{neuron_type}Neuron({len(self.w)})'
+        num_inputs = self.w.shape[0]
+        return f"StandardNeuron({num_inputs}, '{self._activation}')"
 
 
 class Layer(Module):
 
     def __init__(self, num_inputs, num_outputs, activation='tanh'):
+        self.num_inputs = num_inputs
+        self.num_outputs = num_outputs
+        self._activation = activation
         self.neurons = [Neuron(num_inputs, activation) for _ in range(num_outputs)]
 
     def __call__(self, x):
@@ -80,7 +52,9 @@ class Layer(Module):
         return [p for n in self.neurons for p in n.parameters()]
 
     def __repr__(self):
-        return f"Layer({self.neurons})"
+        neuron_type = str(self.neurons[0]).split('(')[0]
+        return (f"Layer({neuron_type}('{self._activation}'), "
+                f"{self.num_inputs}, {self.num_outputs})")
 
 
 class VanillaNN(Module):

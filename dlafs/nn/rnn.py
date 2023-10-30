@@ -1,11 +1,12 @@
 from dlafs.autograd import Value
 from dlafs.array import ValueArray
-from dlafs.nn.dnn import Module, BaseNeuron
+from dlafs.nn.common import Module, BaseNeuron, _format_activation_str
 
 
 class RecurrentNeuron(BaseNeuron):
 
     def __init__(self, num_inputs, hidden_size, activation='tanh', neuron_id=''):
+        """Initialize the weights and bias randomly, and set the activation function"""
         if neuron_id:
             neuron_id = f'_{neuron_id}'
         # Initialize the weights and bias
@@ -14,7 +15,7 @@ class RecurrentNeuron(BaseNeuron):
         self.wa = ValueArray.random_normal(shape=(hidden_size, ), label=f'wa{neuron_id}',
                                            mean=0, std=1 / (hidden_size))
         self.ba = Value(0, label='ba')
-        self._activation = activation
+        self._activation = _format_activation_str(activation)
 
     def __call__(self, x, a):
         """The forward pass of a single neuron"""
@@ -36,22 +37,30 @@ class RecurrentNeuron(BaseNeuron):
         return self.wx.values + self.wa.values + [self.ba]
 
     def __repr__(self):
-        return f'RNN-Neuron({self.wx.shape[0]})'
+        num_inputs = self.wx.shape[0]
+        return f"RecurrentNeuron({num_inputs}, '{self._activation}')"
 
 
 class RecurrentLayer(Module):
 
     def __init__(self, num_inputs, hidden_size, activation='tanh'):
+        self.num_inputs = num_inputs
         self.hidden_size = hidden_size
-        self.neurons = [RecurrentNeuron(num_inputs, hidden_size, activation, neuron_id=i) for i in range(hidden_size)]
+        self._activation = activation
+        self.neurons = [
+            RecurrentNeuron(num_inputs, hidden_size, activation, neuron_id=i)
+            for i in range(hidden_size)
+        ]
 
     def __call__(self, x):
+        """The forward pass of a single recurrent layer"""
         x = ValueArray(x)
         # Check that the number of inputs equals the number of weights
         if not x.shape[1] == self.neurons[0].wx.shape[0]:
             raise ValueError(f'Expected {self.neurons[0].wx.shape[0]} inputs, got {x.shape[1]}')
 
-        a_t = ValueArray.zeros(shape=(self.hidden_size,), label='a_t')  # Initialize hidden state to zeros
+        # Initialize hidden state to zeros
+        a_t = ValueArray.zeros(shape=(self.hidden_size,), label='a_t')
         a = []
         for x_t in x:
             a_t = [n(x_t, a_t) for n in self.neurons]
@@ -63,7 +72,9 @@ class RecurrentLayer(Module):
         return [p for n in self.neurons for p in n.parameters()]
 
     def __repr__(self):
-        return f"RecurrentLayer({self.neurons})"
+        neuron_type = str(self.neurons[0]).split('(')[0]
+        return (f"RecurrentLayer({neuron_type}('{self._activation}'), "
+                f"{self.num_inputs}, {self.hidden_size})")
 
 
 class RecurrentNN(Module):
@@ -72,6 +83,7 @@ class RecurrentNN(Module):
         self.layers = layers
 
     def __call__(self, x):
+        """The forward pass of a recurrent NN."""
         x = ValueArray(x)
         for layer in self.layers:
             if x.dim() > 1 and not isinstance(layer, RecurrentLayer):
