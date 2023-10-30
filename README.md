@@ -21,7 +21,7 @@ The following models and tasks have been implemented:
 
 * [x] AutoGrad
 * [x] Vanilla Neural Network
-* [ ] Recurrent Neural Network
+* [x] Recurrent Neural Network
 * [ ] LSTM
 * [ ] Transformer
 * [ ] Convolutional Neural Network
@@ -35,5 +35,7 @@ There is no requirements to run the models themself, but `numpy` is used for som
 The following sources have been used to implement the models:
 
 * [Andrej Karpathy's Intro to Backprop and Neural Nets](https://www.youtube.com/watch?v=VMj-3S1tku0)
-* [Andrej Karpathy's GPT from Scratch](https://www.youtube.com/watch?v=kCc8FmEb1nY)
 * [PyTorch`s Autograd](https://pytorch.org/docs/stable/notes/autograd.html)
+* [An Introduction to Recurrent Neural Networks and the Math That Powers Them](https://machinelearningmastery.com/an-introduction-to-recurrent-neural-networks-and-the-math-that-powers-them/)
+* [The Unreasonable Effectiveness of Recurrent Neural Networks](https://karpathy.github.io/2015/05/21/rnn-effectiveness/)
+* [Andrej Karpathy's GPT from Scratch](https://www.youtube.com/watch?v=kCc8FmEb1nY)
