@@ -86,7 +86,7 @@ class RecurrentNN(Module):
         """The forward pass of a recurrent NN."""
         x = ValueArray(x)
         for layer in self.layers:
-            if x.dim() > 1 and not isinstance(layer, RecurrentLayer):
+            if x.dim > 1 and not isinstance(layer, RecurrentLayer):
                 new_x = []
                 for x_t in x:
                     new_x.append(layer(x_t))

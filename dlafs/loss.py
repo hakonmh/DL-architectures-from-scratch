@@ -101,13 +101,13 @@ def _coerce_single_dim_args(y_true, y_pred):
     """
     if not isinstance(y_true, ValueArray):
         y_true = ValueArray(y_true)
-    if y_true.dim() < 1:
+    if y_true.dim < 1:
         y_true = [y_true.values]
         y_true = ValueArray(y_true)
 
     if not isinstance(y_pred, ValueArray):
         y_pred = ValueArray(y_pred)
-    if y_pred.dim() < 1:
+    if y_pred.dim < 1:
         y_pred = [y_pred.values]
         y_pred = ValueArray(y_pred)
 
@@ -122,13 +122,13 @@ def _coerce_multi_dim_args(y_true, y_pred):
     """
     if not isinstance(y_true, ValueArray):
         y_true = ValueArray(y_true)
-    if y_true.dim() < 2:
+    if y_true.dim < 2:
         y_true = [y_true.values]
         y_true = ValueArray(y_true)
 
     if not isinstance(y_pred, ValueArray):
         y_pred = ValueArray(y_pred)
-    if y_pred.dim() < 2:
+    if y_pred.dim < 2:
         y_pred = [y_pred.values]
         y_pred = ValueArray(y_pred)
 

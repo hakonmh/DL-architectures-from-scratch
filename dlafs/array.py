@@ -72,7 +72,7 @@ class ValueArray(Sequence):
         """Return the value of the Array as a Value scalar"""
         if max(self.shape) == 1:
             item = self.values
-            for _ in range(self.dim()):
+            for _ in range(self.dim):
                 item = item[0]
             return item
         else:
@@ -82,6 +82,7 @@ class ValueArray(Sequence):
         """Return the length of the Array"""
         return len(self.values)
 
+    @property
     def dim(self):
         """Return the number of dimensions of the Array"""
         return len(self.shape)
@@ -128,7 +129,7 @@ class ValueArray(Sequence):
         """Set an item in the Array using the given index"""
         if not isinstance(index, tuple):
             index = (index,)
-        for _ in range(self.dim() - len(index)):
+        for _ in range(self.dim - len(index)):
             index = index + (slice(None),)
 
         data = self._recursive_setitem(self.values, index, value)
@@ -174,9 +175,9 @@ class ValueArray(Sequence):
 
     def __repr__(self):
         self._max_str_len = _get_max_str_len(self.values, max_len=0)
-        item_str = self._repr_helper(self.values, depth=self.dim())
+        item_str = self._repr_helper(self.values, depth=self.dim)
         if self.label:
-            if self.dim() < 3:
+            if self.dim < 3:
                 return f"ValueArray(\n    {item_str},\n    label='{self.label}'\n)"
             else:
                 return f"ValueArray(\n    {item_str},\n\n    label='{self.label}'\n)"
@@ -190,7 +191,7 @@ class ValueArray(Sequence):
             return "[" + ", ".join(str_data) + "]"
         else:
             newlines = '\n' * (depth - 1)
-            spaces = ' ' * (5 + self.dim() - depth)
+            spaces = ' ' * (5 + self.dim - depth)
             join_str = f",{newlines}{spaces}"
             return "[" + join_str.join(self._repr_helper(item, depth - 1) for item in data) + "]"
 
