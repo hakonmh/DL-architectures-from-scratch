@@ -30,10 +30,13 @@ class BaseNeuron(Module):
 
 class Neuron(BaseNeuron):
 
-    def __init__(self, num_inputs, activation='tanh'):
+    def __init__(self, num_inputs, activation='tanh', neuron_id=''):
         """Initialize the weights and bias randomly, and set the activation function"""
-        self.w = ValueArray([Value(random.uniform(-1, 1), label=f'w_{i+1}') for i in range(num_inputs)])
-        self.b = Value(random.uniform(-1, 1), label='b')
+        if neuron_id is not None:
+            neuron_id = f'_{neuron_id}'
+
+        self.w = ValueArray.random_uniform((num_inputs, ), low=-1, high=1, label=f'w{neuron_id}')
+        self.b = Value(random.uniform(-1, 1), label=f'b{neuron_id}')
         self._activation = activation
 
     def __call__(self, x):
