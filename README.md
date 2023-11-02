@@ -35,6 +35,7 @@ There is no requirements to run the models themself, but `numpy` and `graphviz` 
 
 The following sources have been used to implement the models:
 
+* [TinyGrad](https://github.com/tinygrad/tinygrad)
 * [Andrej Karpathy's Intro to Backprop and Neural Nets](https://www.youtube.com/watch?v=VMj-3S1tku0)
 * [PyTorch`s Autograd](https://pytorch.org/docs/stable/notes/autograd.html)
 * [An Introduction to Recurrent Neural Networks and the Math That Powers Them](https://machinelearningmastery.com/an-introduction-to-recurrent-neural-networks-and-the-math-that-powers-them/)
