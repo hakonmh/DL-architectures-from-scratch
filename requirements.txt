@@ -1,5 +1,6 @@
 numpy
+graphviz
+# Test and notebooks only
 pytorch
 pytest
-graphviz
 matplotlib
