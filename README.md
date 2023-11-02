@@ -2,9 +2,9 @@
 
 This repository attempts to build different neural network architectures from scratch using only Pure Python. The goal is to keep my understanding of the inner workings of neural networks and the math behind them fresh, since it is easy to forget the details when using high-level libraries.
 
-The code is written in a way that is easy to understand and to follow along. Explanations are provided in the form of Jupyter notebooks. The code is also tested against PyTorch implementations of the same models to make sure the implementation is correct.
+The code is written in a way that is easy to understand and to follow along. Explanations are provided in the form of Jupyter notebooks. The code is also tested to make sure the implementation is correct.
 
-We first start with implementing AutoGrad, which is the backbone of PyTorch and is used to do automatic differentiation. We then use AutoGrad to implement a simple neural network with one hidden layer. The goal is to later implement more complex architectures like CNNs, RNNs and Transformers.
+We first start with implementing AutoGrad, which is the backbone of PyTorch and is used to do automatic differentiation. We then use AutoGrad to implement a basic neural network. The goal is to later implement more complex architectures like CNNs, RNNs and Transformers.
 
 ## Layout
 
@@ -20,6 +20,7 @@ The repository is structured as follows:
 The following models and tasks have been implemented:
 
 * [x] AutoGrad
+* [x] ValueArray
 * [x] Vanilla Neural Network
 * [x] Recurrent Neural Network
 * [ ] LSTM
@@ -28,7 +29,7 @@ The following models and tasks have been implemented:
 
 ## Requirements
 
-There is no requirements to run the models themself, but `numpy` is used for some convenience functions found in `helpers`. Several libraries like `graphviz`, `pandas`, `numpy` and `matplotlib` is required to run the notebooks, while `pytest`, `torch`, and `numpy` is required to run the tests.
+There is no requirements to run the models themself, but `numpy` and `graphviz` is used for some convenience functions found in `dlafs/helpers`. For running the notebooks, libraries like `graphviz`, `pandas`, `numpy` and `matplotlib`. `pytest`, `torch`, and `numpy` is required to run the tests.
 
 ## Sources
 
